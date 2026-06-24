@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>직장인 휴가코어 테스트 🏖️</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+
+:root {
+  --ocean: #0077B6;
+  --sky: #00B4D8;
+  --sand: #FFD166;
+  --coral: #FF6B6B;
+  --mint: #06D6A0;
+  --deep: #023E8A;
+  --light: #F0F8FF;
+  --gray: #6B7280;
+  --dark: #1A1A2E;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family:'Noto Sans KR', sans-serif;
+  background:var(--light);
+  color:var(--dark);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+.wave-bg {
+  position:fixed; inset:0; z-index:-1;
+  background:linear-gradient(160deg,#DCEFFE 0%,#F0FAFF 50%,#FFF8EC 100%);
+}
+.wave-bg::after {
+  content:'';
+  position:absolute; bottom:-40px; left:-5%;
+  width:110%; height:220px;
+  background:linear-gradient(180deg,transparent,rgba(0,180,216,0.07));
+  border-radius:50% 50% 0 0;
+  animation:wv 7s ease-in-out infinite;
+}
+@keyframes wv { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+
+.screen { display:none; animation:up .4s ease; }
+.screen.active { display:block; }
+@keyframes up { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+.wrap { max-width:520px; margin:0 auto; padding:36px 18px 80px; }
+
+/* ── INTRO ── */
+.badge {
+  display:inline-block;
+  background:linear-gradient(135deg,var(--ocean),var(--sky));
+  color:#fff; font-size:11px; font-weight:700;
+  letter-spacing:2px; padding:5px 14px;
+  border-radius:20px; margin-bottom:20px;
+}
+.intro-icon { font-size:70px; display:block; margin-bottom:12px; animation:bob 3s ease-in-out infinite; }
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+.intro-title { font-size:clamp(24px,6vw,32px); font-weight:900; line-height:1.25; color:var(--deep); margin-bottom:10px; }
+.intro-title em { color:var(--sky); font-style:normal; }
+.intro-sub { font-size:14.5px; color:var(--gray); line-height:1.75; margin-bottom:28px; }
+.intro-sub strong { color:var(--ocean); }
+
+.info-box { background:#fff; border:1.5px solid rgba(0,180,216,.2); border-radius:16px; padding:18px 20px; margin-bottom:28px; text-align:left; }
+.info-row { display:flex; align-items:center; gap:10px; font-size:13px; color:#374151; padding:5px 0; }
+.info-row:not(:last-child) { border-bottom:1px solid #F3F4F6; }
+.info-icon { font-size:17px; flex-shrink:0; }
+
+/* ── BUTTONS ── */
+.btn-main {
+  display:block; width:100%; padding:17px;
+  border:none; border-radius:16px;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:17px; font-weight:700; cursor:pointer;
+  background:linear-gradient(135deg,var(--ocean),var(--sky));
+  color:#fff; box-shadow:0 8px 24px rgba(0,119,182,.3);
+  transition:all .2s;
+}
+.btn-main:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(0,119,182,.4); }
+
+/* ── PROGRESS ── */
+.prog-wrap { margin-bottom:24px; }
+.prog-top { display:flex; justify-content:space-between; margin-bottom:8px; }
+.prog-label { font-size:12px; color:var(--gray); font-weight:500; }
+.prog-num { font-size:13px; font-weight:700; color:var(--ocean); }
+.prog-bg { height:5px; border-radius:99px; background:rgba(0,119,182,.12); overflow:hidden; }
+.prog-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--ocean),var(--sky)); transition:width .4s ease; }
+
+/* ── QUESTION ── */
+.q-card { background:#fff; border-radius:22px; padding:26px 22px 22px; box-shadow:0 4px 20px rgba(0,0,0,.07); margin-bottom:16px; }
+.q-situation {
+  background:linear-gradient(135deg,rgba(0,119,182,.06),rgba(0,180,216,.06));
+  border-left:3px solid var(--sky);
+  border-radius:0 10px 10px 0;
+  padding:12px 14px; margin-bottom:18px;
+  font-size:13px; color:#374151; line-height:1.65;
+  font-style:italic;
+}
+.q-text { font-size:17px; font-weight:700; color:var(--deep); line-height:1.5; margin-bottom:20px; }
+
+.opts { display:flex; flex-direction:column; gap:9px; }
+.opt {
+  display:flex; align-items:flex-start; gap:12px;
+  background:#F9FAFB; border:2px solid #E5E7EB;
+  border-radius:13px; padding:14px 16px;
+  cursor:pointer; transition:all .18s; text-align:left;
+}
+.opt:hover { border-color:var(--sky); background:#EFF9FF; }
+.opt.sel { border-color:var(--ocean); background:#EFF9FF; }
+.opt-dot {
+  width:28px; height:28px; border-radius:50%; flex-shrink:0;
+  background:#E5E7EB; display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; color:#9CA3AF; transition:all .18s; margin-top:1px;
+}
+.opt.sel .opt-dot { background:var(--ocean); color:#fff; }
+.opt-text { font-size:14px; color:#374151; line-height:1.5; font-weight:500; }
+
+.q-nav { display:flex; gap:8px; margin-top:8px; }
+.btn-prev {
+  flex:0 0 auto; background:#fff; color:var(--gray);
+  border:2px solid #E5E7EB; border-radius:13px;
+  padding:13px 18px; font-size:14px; cursor:pointer; transition:all .18s;
+}
+.btn-prev:hover { border-color:var(--ocean); color:var(--ocean); }
+.btn-next {
+  flex:1; background:linear-gradient(135deg,var(--ocean),var(--sky));
+  color:#fff; border:none; border-radius:13px;
+  padding:13px; font-size:15px; font-weight:700;
+  cursor:pointer; font-family:'Noto Sans KR',sans-serif;
+  opacity:.35; pointer-events:none; transition:all .18s;
+}
+.btn-next.on { opacity:1; pointer-events:all; }
+
+/* ── LOADING ── */
+.loading-wrap { padding:80px 20px; text-align:center; }
+.ring {
+  width:56px; height:56px;
+  border:4px solid rgba(0,119,182,.15);
+  border-top-color:var(--ocean);
+  border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 20px;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+.load-t { font-size:16px; font-weight:700; color:var(--deep); margin-bottom:4px; }
+.load-s { font-size:13px; color:var(--gray); }
+
+/* ── RESULT ── */
+.r-card { background:#fff; border-radius:26px; overflow:hidden; box-shadow:0 8px 36px rgba(0,0,0,.1); margin-bottom:20px; }
+.r-header {
+  padding:34px 26px 26px; text-align:center; position:relative; overflow:hidden;
+}
+.r-header::before {
+  content:''; position:absolute; inset:0; opacity:.1;
+  background:repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(255,255,255,.7) 8px,rgba(255,255,255,.7) 16px);
+}
+.r-badge {
+  display:inline-block;
+  background:rgba(255,255,255,.22); backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.4);
+  color:#fff; font-size:10px; font-weight:700; letter-spacing:1.5px;
+  padding:4px 12px; border-radius:20px; margin-bottom:14px; text-transform:uppercase;
+}
+.r-emoji { font-size:68px; display:block; margin-bottom:12px; }
+.r-name { font-size:26px; font-weight:900; color:#fff; margin-bottom:4px; }
+.r-slogan { font-size:13.5px; color:rgba(255,255,255,.88); font-weight:500; margin-bottom:0; }
+
+.r-body { padding:24px; }
+.r-catchphrase {
+  text-align:center; font-size:18px; font-weight:900; color:var(--deep);
+  line-height:1.4; margin-bottom:16px; padding:16px;
+  background:linear-gradient(135deg,rgba(0,119,182,.06),rgba(0,180,216,.06));
+  border-radius:14px;
+}
+.r-desc { font-size:14px; color:#374151; line-height:1.85; margin-bottom:18px; background:#F9FAFB; border-radius:12px; padding:16px 18px; }
+
+.r-tags { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:18px; }
+.tag { padding:5px 13px; border-radius:20px; font-size:12px; font-weight:600; background:#EFF9FF; color:var(--ocean); border:1px solid rgba(0,119,182,.18); }
+
+.r-match {
+  display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px;
+}
+.match-box { border-radius:14px; padding:14px 16px; }
+.match-box.good { background:linear-gradient(135deg,#E8F8F5,#D1FAE5); border:1.5px solid #6EE7B7; }
+.match-box.bad { background:linear-gradient(135deg,#FEF3F2,#FEE2E2); border:1.5px solid #FCA5A5; }
+.match-label { font-size:10px; font-weight:700; letter-spacing:1px; margin-bottom:6px; text-transform:uppercase; }
+.match-box.good .match-label { color:#065F46; }
+.match-box.bad .match-label { color:#991B1B; }
+.match-type { font-size:14px; font-weight:700; color:#1F2937; }
+.match-why { font-size:11.5px; color:#6B7280; margin-top:3px; line-height:1.4; }
+
+.event-box {
+  background:linear-gradient(135deg,var(--deep),var(--ocean));
+  border-radius:14px; padding:18px; text-align:center; color:#fff;
+}
+.event-title { font-size:12px; opacity:.8; margin-bottom:6px; letter-spacing:.5px; }
+.event-desc { font-size:15px; font-weight:700; line-height:1.5; }
+
+.share-row { display:flex; gap:8px; margin-top:18px; }
+.btn-copy { flex:1; padding:13px; border-radius:13px; font-family:'Noto Sans KR',sans-serif; font-size:14px; font-weight:700; cursor:pointer; border:none; background:var(--sand); color:var(--dark); transition:all .18s; }
+.btn-retry { flex:1; padding:13px; border-radius:13px; font-family:'Noto Sans KR',sans-serif; font-size:14px; font-weight:700; cursor:pointer; border:none; background:#F3F4F6; color:var(--gray); }
+
+/* TOAST */
+.toast {
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+  background:var(--deep); color:#fff;
+  padding:11px 22px; border-radius:99px;
+  font-size:13.5px; font-weight:600;
+  opacity:0; pointer-events:none; transition:opacity .3s;
+  white-space:nowrap; z-index:999;
+}
+.toast.on { opacity:1; }
+
+.text-center { text-align:center; }
+.mt-6 { margin-top:6px; }
+</style>
+</head>
+<body>
+
+<div class="wave-bg"></div>
+<div class="toast" id="toast">📋 링크가 복사됐어요!</div>
+
+<!-- ── INTRO ── -->
+<div class="screen active" id="s-intro">
+  <div class="wrap text-center">
+    <span class="badge">🏢 2026 미래엔 여름휴가 이벤트</span>
+    <span class="intro-icon">☀️</span>
+    <h1 class="intro-title">무더운 여름…<br>어디론가 <em>훌쩍</em> 떠나고 싶지 않아? 🌊</h1>
+    <p class="intro-sub">
+      이번 여름은 어디로 떠날까?<br>
+      시~원하게 연차 쓰고,<br>
+      <strong>너만의 휴가 코어</strong>를 찾아봐! 🔥<br><br>
+      결과 캡처 후 사내 채널에 올리면<br>
+      <strong>경품 추첨 자동 응모</strong> 완료 🎁
+    </p>
+    <div class="info-box">
+      <div class="info-row"><span class="info-icon">⏱️</span><span>약 <strong>1분</strong>이면 끝나!</span></div>
+      <div class="info-row"><span class="info-icon">🎯</span><span><strong>8문항</strong>으로 알아보는 나의 휴가 코어 유형</span></div>
+      <div class="info-row"><span class="info-icon">🎁</span><span>결과 공유하면 <strong>경품 추첨</strong> 응모 완료!</span></div>
+      <div class="info-row"><span class="info-icon">📅</span><span>응모 마감 <strong>7월 ○○일</strong>까지</span></div>
+    </div>
+    <button class="btn-main" onclick="startQuiz()">테스트 시작하기 →</button>
+    <p class="mt-6" style="font-size:11px;color:#9CA3AF">* 개인정보는 이벤트 응모 목적 외 사용하지 않습니다</p>
+  </div>
+</div>
+
+<!-- ── QUIZ ── -->
+<div class="screen" id="s-quiz">
+  <div class="wrap">
+    <div class="prog-wrap">
+      <div class="prog-top">
+        <span class="prog-label">진행 중</span>
+        <span class="prog-num" id="q-num">1 / 8</span>
+      </div>
+      <div class="prog-bg"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+    <div class="q-card">
+      <div class="q-situation" id="q-sit"></div>
+      <p class="q-text" id="q-text"></p>
+      <div class="opts" id="opts"></div>
+    </div>
+    <div class="q-nav">
+      <button class="btn-prev" id="btn-prev" onclick="prevQ()">← 이전</button>
+      <button class="btn-next" id="btn-next" onclick="nextQ()">다음 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── LOADING ── -->
+<div class="screen" id="s-loading">
+  <div class="wrap">
+    <div class="loading-wrap">
+      <div class="ring"></div>
+      <p class="load-t">휴가 코어 분석 중... 🔍</p>
+      <p class="load-s">잠깐만! 거의 다 됐어 😆</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── RESULT ── -->
+<div class="screen" id="s-result">
+  <div class="wrap">
+    <div class="r-card">
+      <div class="r-header" id="r-header">
+        <span class="r-badge">나의 휴가 코어</span>
+        <span class="r-emoji" id="r-emoji"></span>
+        <p class="r-name" id="r-name"></p>
+        <p class="r-slogan" id="r-slogan"></p>
+      </div>
+      <div class="r-body">
+        <div class="r-catchphrase" id="r-catch"></div>
+        <p class="r-desc" id="r-desc"></p>
+        <div class="r-tags" id="r-tags"></div>
+        <div class="r-match">
+          <div class="match-box good">
+            <p class="match-label">✅ 찰떡 메이트</p>
+            <p class="match-type" id="r-good-type"></p>
+            <p class="match-why" id="r-good-why"></p>
+          </div>
+          <div class="match-box bad">
+            <p class="match-label">⚡ 여행 갈등각</p>
+            <p class="match-type" id="r-bad-type"></p>
+            <p class="match-why" id="r-bad-why"></p>
+          </div>
+        </div>
+        <div class="event-box">
+          <p class="event-title">🎁 이벤트 응모 방법</p>
+          <p class="event-desc">이 화면 캡처 후 사내 채널에 공유하면<br>추첨 이벤트 응모 완료!</p>
+        </div>
+      </div>
+    </div>
+    <div class="share-row">
+      <button class="btn-copy" onclick="copyLink()">🔗 링크 복사</button>
+      <button class="btn-retry" onclick="restart()">🔄 다시 하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── 데이터 ──────────────────────────────────────────────────────
+const Q = [
+  {
+    sit: "📅 드디어 여름휴가 일정이 확정됐어! 제일 먼저 뭐 해?",
+    text: "나는…",
+    opts: [
+      { t:"✈️ 항공권·숙소 먼저 예약! 계획 없으면 불안함", s:{planner:3} },
+      { t:"🚗 무조건 일단 떠나고 봄. 즉흥이 최고지", s:{impuls:3} },
+      { t:"🛋️ 드디어 쉰다... 집에서 아무것도 안 할 예정", s:{relaxer:3} },
+      { t:"👨‍👩‍👧 가족들한테 언제 시간 되는지 먼저 물어봄", s:{family:3} },
+    ]
+  },
+  {
+    sit: "🧳 휴가 전날 밤, 짐을 싸야 하는데…",
+    text: "나의 짐 싸기 레벨은?",
+    opts: [
+      { t:"📋 일주일 전부터 짐 목록 작성... 이미 다 쌌음 ㅎ", s:{planner:3} },
+      { t:"🤷 대충 던져 넣음. 없으면 현지에서 사면 되지~", s:{impuls:3} },
+      { t:"😴 편한 옷이랑 충전기만 있으면 됨. 최소주의자", s:{relaxer:3} },
+      { t:"👨‍👩‍👧 가족 짐 다 챙기다 보면 내 짐은 늘 뒷순위...", s:{family:3} },
+    ]
+  },
+  {
+    sit: "🌊 드디어 휴가지 도착! 숙소 체크인 완료!",
+    text: "제일 먼저 뭐 해?",
+    opts: [
+      { t:"🗺️ 오늘 동선 최종 확인하고 바로 첫 번째 목적지 고고", s:{planner:3} },
+      { t:"🚶 일단 근처 골목 걸어봄. 뭔가 있겠지~", s:{impuls:3} },
+      { t:"🛏️ 침대에 대자로 누움... 잠깐만 쉬고... Zzz", s:{relaxer:3} },
+      { t:"💬 가족들한테 \"뭐 하고 싶어?\" 먼저 물어봄", s:{family:3} },
+    ]
+  },
+  {
+    sit: "📱 점심 먹고 있는데 팀장님 카톡이 왔다...!",
+    text: "나의 반응은?",
+    opts: [
+      { t:"😤 일단 읽음. 중요한 건 빠르게 답하고 넘어감", s:{planner:2,family:1} },
+      { t:"😎 '나중에 확인할게요~' 한 마디 후 폰 뒤집어 놓음", s:{impuls:3} },
+      { t:"🙈 안 읽음. 휴가 중 업무카톡은 없는 거임", s:{relaxer:3} },
+      { t:"😰 읽고 걱정돼서 확인 전화까지... 혹시 큰일 났나", s:{family:1,planner:2} },
+    ]
+  },
+  {
+    sit: "🍜 저녁 뭐 먹지? 메뉴 정하는 시간이 왔다",
+    text: "나는?",
+    opts: [
+      { t:"📍 미리 저장해 둔 맛집 리스트에서 동선 맞는 곳으로", s:{planner:3} },
+      { t:"👀 걷다가 줄 서 있는 집 발견! 무조건 들어감", s:{impuls:3} },
+      { t:"📦 배달 가능하면 숙소에서 시켜먹는 게 최고지~", s:{relaxer:3} },
+      { t:"🙌 가족 모두 좋아하는 메뉴 찾느라 30분째 토론 중", s:{family:3} },
+    ]
+  },
+  {
+    sit: "🌙 휴가 마지막 날 저녁. 내일 복귀하는데…",
+    text: "지금 내 심정은?",
+    opts: [
+      { t:"✅ 계획한 거 다 했나 체크 중. 완성도 100% 달성!", s:{planner:3} },
+      { t:"😭 아쉽다 너무... 내일 일정 하나만 더 욱여넣을까", s:{impuls:3} },
+      { t:"😌 솔직히 내 침대 그리웠음. 잘 쉬었으니 됐지 뭐", s:{relaxer:3} },
+      { t:"🥹 가족이 좋아했으면 그걸로 충분. 그게 다야", s:{family:3} },
+    ]
+  },
+  {
+    sit: "📸 이번 휴가에서 사진이 500장 찍혔다",
+    text: "나의 사진 관리는?",
+    opts: [
+      { t:"🗂️ 날짜·장소별 폴더 정리. 나중에 포토북도 만들 예정", s:{planner:3} },
+      { t:"🔥 베스트컷 5장만 골라서 인스타에 바로 올림", s:{impuls:3} },
+      { t:"💀 정리... 할 수 있을까. 그냥 폰에 쌓아놓을 듯", s:{relaxer:3} },
+      { t:"🖼️ 가족 사진 뽑아서 액자에 걸어두고 싶다...", s:{family:3} },
+    ]
+  },
+  {
+    sit: "🔋 복귀 첫날 월요일 아침. 출근길에…",
+    text: "내 상태는?",
+    opts: [
+      { t:"🗓️ 다음 여행 계획 이미 짜는 중. 삶의 목표 생김 ㅎ", s:{planner:3} },
+      { t:"😔 이번에 못 해본 것들이 계속 생각나... 아쉽다", s:{impuls:3} },
+      { t:"⚡ 완전 충전 완료! 오히려 일하고 싶은 느낌..?", s:{relaxer:3} },
+      { t:"🥰 가족이랑 보낸 시간이 자꾸 생각나서 훈훈함", s:{family:3} },
+    ]
+  },
+];
+
+const TYPES = {
+  planner: {
+    emoji:"✈️", name:"철저한 계획러",
+    slogan:"출발 전부터 이미 여행 중인 유형",
+    color:["#0077B6","#00B4D8"],
+    catch:'"여행 일정표 짜는 게 취미예요 ㅎ"',
+    desc:"여행 준비 자체가 이미 설레는 사람! 🗂️ 숙소 비교, 맛집 리스트, 분 단위 동선까지 꼼꼼하게 준비해야 마음이 놓이는 타입이야. 덕분에 같이 여행하는 사람들은 항상 네 덕에 알차고 빠짐없이 즐길 수 있지. 여행 다녀와서 포토북까지 완성돼야 진짜 끝나는 진정한 계획러!",
+    tags:["#일정표는사랑","#플랜B까지준비","#예약완료","#맛집리스트저장","#알차게알차게"],
+    goodType:"즉흥 탐험러 🚗", goodWhy:"네 계획에 활기를 팍팍 더해줘!",
+    badType:"완전 충전러 🛋️", badWhy:"\"거기 왜 가요? 그냥 쉬면 안 돼요?\" 무한 충돌각"
+  },
+  impuls: {
+    emoji:"🚗", name:"즉흥 탐험러",
+    slogan:"목적지보다 과정이 더 재밌는 유형",
+    color:["#F59E0B","#EF4444"],
+    catch:'"계획? 그게 뭐야 먹는 거야? 🤣"',
+    desc:"예상 못 한 골목에서 발견한 찐 로컬 맛집, 즉흥으로 합류한 거리 축제, 계획에 없던 드라이브가 최고의 추억이 되는 타입이야 🔥 일정이 바뀌어도 오히려 더 설레고, 가보지 않은 길을 택하는 게 본능인 진짜 탐험러! 단, 계획파랑 여행 가면... 조금 조율이 필요할 수도 😅",
+    tags:["#일단떠나고봄","#즉흥이최고","#숨은명소발굴","#경험수집가","#예상밖의즐거움"],
+    goodType:"완전 충전러 🛋️", goodWhy:"무계획도 OK! 편하게 맞춰줘서 찰떡",
+    badType:"철저한 계획러 ✈️", badWhy:"일정표 vs 즉흥... 여행 내내 눈치 싸움각"
+  },
+  relaxer: {
+    emoji:"🛋️", name:"완전 충전러",
+    slogan:"아무것도 안 하는 게 진짜 휴가인 유형",
+    color:["#667EEA","#764BA2"],
+    catch:'"이미 누웠는데 어딜 또 가...? 🙄"',
+    desc:"진짜 휴가는 몸도 마음도 완전히 비우는 것! 알람 없는 아침 + 무한 정주행 + 배달음식 삼박자가 완성되면 어디든 완벽한 휴가야 🛋️ '여행다운 여행' 해야 한다는 압박에 흔들리지 않는 확고한 자기 취향 보유자! 월요일 출근하면 오히려 에너지 넘치는 완충 전문가 ⚡",
+    tags:["#집이최고","#넷플릭스정주행","#알람OFF","#배달의민족","#완전충전완료"],
+    goodType:"가족 힐링러 👨‍👩‍👧", goodWhy:"조용하게 쉬는 분위기 같이 즐겨줘서 찰떡",
+    badType:"즉흥 탐험러 🚗", badWhy:"쉬려는데 자꾸 \"어디 가자~\" 하는 에너자이저"
+  },
+  family: {
+    emoji:"👨‍👩‍👧", name:"가족 힐링러",
+    slogan:"같이 웃는 순간이 최고의 여행인 유형",
+    color:["#06D6A0","#0EA5E9"],
+    catch:'"가족이 행복하면 나도 행복해 🥹"',
+    desc:"휴가의 진짜 의미는 함께하는 사람한테 있다는 걸 아는 따뜻한 타입이야 🥰 화려한 여행지보다 가족 모두가 편하게 웃을 수 있는 공간이 최고! 여행에서 찍은 가족사진 한 장, 함께 나눈 저녁 한 끼가 어떤 핫플보다 소중한 추억이 되는... 인간 온기 그 자체인 유형이야",
+    tags:["#가족최우선","#함께라면어디든","#추억만들기","#가족사진뽑을예정","#소중한사람들"],
+    goodType:"철저한 계획러 ✈️", goodWhy:"가족 모두 챙기는 완벽 일정 짜줘서 찰떡!",
+    badType:"완전 충전러 🛋️", badWhy:"\"같이 뭔가 하자~\" vs \"난 쉴래\" 무한 온도차"
+  },
+};
+
+// ── STATE ────────────────────────────────────────────────────────
+let cur = 0, ans = new Array(Q.length).fill(null);
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function startQuiz(){
+  cur=0; ans=new Array(Q.length).fill(null);
+  renderQ(); show('s-quiz');
+}
+
+function renderQ(){
+  const q=Q[cur];
+  document.getElementById('q-sit').textContent=q.sit;
+  document.getElementById('q-text').textContent=q.text;
+  document.getElementById('q-num').textContent=`${cur+1} / ${Q.length}`;
+  document.getElementById('prog-fill').style.width=`${(cur/Q.length)*100}%`;
+
+  const el=document.getElementById('opts'); el.innerHTML='';
+  const lt=['A','B','C','D'];
+  q.opts.forEach((o,i)=>{
+    const d=document.createElement('div');
+    d.className='opt'+(ans[cur]===i?' sel':'');
+    d.innerHTML=`<span class="opt-dot">${lt[i]}</span><span class="opt-text">${o.t}</span>`;
+    d.onclick=()=>pick(i);
+    el.appendChild(d);
+  });
+
+  const nb=document.getElementById('btn-next');
+  nb.textContent=cur===Q.length-1?'결과 보기 🎉':'다음 →';
+  nb.classList.toggle('on',ans[cur]!==null);
+  document.getElementById('btn-prev').style.visibility=cur===0?'hidden':'visible';
+}
+
+function pick(i){
+  ans[cur]=i;
+  document.querySelectorAll('.opt').forEach((e,idx)=>e.classList.toggle('sel',idx===i));
+  document.getElementById('btn-next').classList.add('on');
+}
+
+function nextQ(){
+  if(ans[cur]===null)return;
+  if(cur<Q.length-1){cur++;renderQ();}
+  else calcResult();
+}
+
+function prevQ(){ if(cur>0){cur--;renderQ();} }
+
+function calcResult(){
+  show('s-loading');
+  setTimeout(()=>{
+    const sc={planner:0,impuls:0,relaxer:0,family:0};
+    ans.forEach((a,qi)=>{
+      if(a===null)return;
+      Object.entries(Q[qi].opts[a].s).forEach(([k,v])=>sc[k]+=v);
+    });
+    const winner=Object.entries(sc).sort((a,b)=>b[1]-a[1])[0][0];
+    renderResult(TYPES[winner]);
+    show('s-result');
+  },1600);
+}
+
+function renderResult(t){
+  document.getElementById('r-emoji').textContent=t.emoji;
+  document.getElementById('r-name').textContent=t.name;
+  document.getElementById('r-slogan').textContent=t.slogan;
+  document.getElementById('r-catch').textContent=t.catch;
+  document.getElementById('r-desc').textContent=t.desc;
+  document.getElementById('r-good-type').textContent=t.goodType;
+  document.getElementById('r-good-why').textContent=t.goodWhy;
+  document.getElementById('r-bad-type').textContent=t.badType;
+  document.getElementById('r-bad-why').textContent=t.badWhy;
+  document.getElementById('r-header').style.background=`linear-gradient(135deg,${t.color[0]},${t.color[1]})`;
+  const el=document.getElementById('r-tags');
+  el.innerHTML=t.tags.map(g=>`<span class="tag">${g}</span>`).join('');
+}
+
+function copyLink(){
+  const url=location.href;
+  if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>toast('📋 링크가 복사됐어요!'));}
+  else{const x=document.createElement('textarea');x.value=url;document.body.appendChild(x);x.select();document.execCommand('copy');document.body.removeChild(x);toast('📋 링크가 복사됐어요!');}
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),2500);
+}
+
+function restart(){ startQuiz(); }
+</script>
+</body>
+</html>
